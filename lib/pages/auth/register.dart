@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:travesia_app/pages/auth/login.dart';
 import 'package:travesia_app/services/auth_service.dart';
+import 'package:travesia_app/utils/alert_utils.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -43,9 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_acceptTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Harap setujui syarat dan ketentuan')),
-      );
+      AlertUtils.showWarning(context, 'Harap setujui syarat dan ketentuan');
       return;
     }
 
@@ -61,17 +60,13 @@ class _RegisterPageState extends State<RegisterPage> {
       if (!mounted) return;
 
       if (result['success']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['message'])),
-        );
+        AlertUtils.showSuccess(context, result['message']);
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginPage()),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['message'])),
-        );
+        AlertUtils.showError(context, result['message']);
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
