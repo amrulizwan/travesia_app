@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:travesia_app/services/auth_service.dart';
 import 'package:travesia_app/pages/auth/login.dart';
+import 'package:travesia_app/utils/alert_utils.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,10 +29,12 @@ class _HomePageState extends State<HomePage> {
 
   AuthService? _authService;
   bool _isLoading = false;
+  Map<String, dynamic> userData = {};
 
   @override
   void initState() {
     super.initState();
+    getUserData();
     _initializeAuthService();
   }
 
@@ -61,6 +64,30 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void getUserData() async {
+    if (_authService == null) {
+      await _initializeAuthService();
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final userData = await _authService?.getUserInfo();
+      if (userData != null) {
+        setState(() {
+          this.userData = userData;
+        });
+      } else {
+        AlertUtils.showWarning(context, "Sesi anda habis,Silahkan Login!");
+        await _handleLogout();
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,21 +108,23 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           PopupMenuButton(
                             offset: const Offset(0, 40),
-                            child: const Row(
+                            child: Row(
                               children: [
-                                CircleAvatar(
+                                const CircleAvatar(
                                   radius: 20,
                                   child: Icon(Icons.person),
                                 ),
-                                SizedBox(width: 10),
+                                const SizedBox(width: 10),
                                 Text(
-                                  'Amrul Izwan',
-                                  style: TextStyle(
+                                  userData.isNotEmpty
+                                      ? userData['nama'] ?? 'User'
+                                      : 'User',
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                Icon(Icons.arrow_drop_down),
+                                const Icon(Icons.arrow_drop_down),
                               ],
                             ),
                             itemBuilder: (BuildContext context) =>
