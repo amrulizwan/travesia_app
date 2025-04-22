@@ -113,6 +113,29 @@ class AuthService {
     await _prefs.setString(userKey, jsonEncode(userData));
   }
 
+  // Future<> _getUserInfo(
+  //   String token,
+  //   String refreshToken,
+  //   Map<String, dynamic> userData,
+  // ) async {
+  //   await _prefs.setString(tokenKey, token);
+  //   await _prefs.setString(refreshTokenKey, refreshToken);
+  //   await _prefs.setString(userKey, jsonEncode(userData));
+  // }
+
+  // getu user info that can be used in the app
+
+  Future<Map<String, dynamic>?> getUserInfo() async {
+    try {
+      final userStr = _prefs.getString(userKey);
+      if (userStr == null) return null;
+
+      return jsonDecode(userStr) as Map<String, dynamic>;
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<void> logout() async {
     await _prefs.remove(tokenKey);
     await _prefs.remove(refreshTokenKey);
